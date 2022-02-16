@@ -15,7 +15,7 @@ mdot=Vdot*1000;             % fluid mass flow rate (Kg/s)
 w_f=4*Vdot/(pi*d_in^2);     % working fluid velocity
 dz=L/(n-1);                 % spatial step (m)
 dtau=dz/w_f;                % maximum time step (s)
-T_int=interval*60;          % total time interval(s)
+T_int=interval*60;          % total time interval (s)
 T_tot= round(T_int/dtau);   % number of time steps
 if dtau>dz/w_f
     fprintf('error in flow rate')
@@ -106,7 +106,7 @@ else
     ylabel('Temperature (K)')
     subplot(2,2,2)
     plot(T,t_tank(1:T_tot),T,t_out,T,t_fc)
-    legend({'t\_tank','t\_out', 't_fc'},'Location','eastoutside')
+    legend({'t\_tank','t\_out', 't\_fc'},'Location','eastoutside')
     ylabel('Temperature (K)')
     subplot(2,2,3)
     plot(T,Q_dot)
