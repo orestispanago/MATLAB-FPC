@@ -101,23 +101,27 @@ else
         end
     end
     fprintf('converged')
-    T=1:time_steps;
+    T=(1:time_steps)*dtau;
     subplot(2,2,1)
     plot(T,t_gc,T,t_ac,T,t_abc,T,t_fc,T,t_ic,T,t_am(1:time_steps))
     legend({'t\_gc','t\_ac', 't\_abc', 't\_fc', 't\_ic','t\_am'},'Location','eastoutside')
     ylabel('Temperature (K)')
+    xlabel('time (s)')
     subplot(2,2,2)
     plot(T,t_in(1:time_steps),T,t_out,T,t_fc)
     legend({'t\_in','t\_out', 't\_fc'},'Location','eastoutside')
     ylabel('Temperature (K)')
+    xlabel('time (s)')
     subplot(2,2,3)
     plot(T,Q_dot)
     ylabel('Q\_dot')
+    xlabel('time (s)')
     subplot(2,2,4)
     %plot(T,G_r(1:time_steps))
     %ylabel('G\_r')
     plot(T,eff)
     ylabel("efficiency")
+    xlabel('time (s)')
     runtime = cputime-ts
     count = fprintf(fid,'run time = %6.1f\n',runtime);
     status = fclose(fid);
