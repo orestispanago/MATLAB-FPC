@@ -1,12 +1,12 @@
-function[B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X,J]= coeff(t_g,t_a,t_ab,t_f,t_i,t_am,dtau,dz,n,mdot,k,w_f)
+function[B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X,J]= coeff(t_g,t_a,t_ab,t_f,t_i,t_am,dtau,dz,nodes,mdot,k,w_f)
 % Coefficients of the transiant temperature equations.
 [p,d_in,r_o,r_in,A,delta_g,delta_i,delta_ab,delta_a,c_g,c_i,rho_g,rho_i,alpha,tau_alpha, K_i,c_ab,rho_ab,c_a]= get_constants;
-[h_g_am, h_r1, h_c1, h_f, h_i_am]= get_h(t_f,t_a,t_g,t_ab,t_i,n,t_am,delta_a,d_in,k,w_f);
+[h_g_am, h_r1, h_c1, h_f, h_i_am]= get_h(t_f,t_a,t_g,t_ab,t_i,nodes,t_am,delta_a,d_in,k,w_f);
 [rho_a] = rho(t_a);
 [rho_f,c_f]= waterprop(t_f);
-B=zeros(n,1);C=zeros(n,1);D=zeros(n,1);E=zeros(n,1);F=zeros(n,1);J=zeros(n,1);K=zeros(n,1);L=zeros(n,1);M=zeros(n,1);O=zeros(n,1);
-P=zeros(n,1);G=zeros(n,1);H=zeros(n,1);Q=zeros(n,1);R=zeros(n,1);S=zeros(n,1);U=zeros(n,1);V=zeros(n,1);W=zeros(n,1);X=zeros(n,1);
-for j=1:n
+B=zeros(nodes,1);C=zeros(nodes,1);D=zeros(nodes,1);E=zeros(nodes,1);F=zeros(nodes,1);J=zeros(nodes,1);K=zeros(nodes,1);L=zeros(nodes,1);M=zeros(nodes,1);O=zeros(nodes,1);
+P=zeros(nodes,1);G=zeros(nodes,1);H=zeros(nodes,1);Q=zeros(nodes,1);R=zeros(nodes,1);S=zeros(nodes,1);U=zeros(nodes,1);V=zeros(nodes,1);W=zeros(nodes,1);X=zeros(nodes,1);
+for j=1:nodes
     B(j)=h_g_am(j)/(c_g*rho_g*delta_g);
     C(j)=h_r1(j)/(c_g*rho_g*delta_g);
     D(j)=h_c1(j)/(c_g*rho_g*delta_g);
