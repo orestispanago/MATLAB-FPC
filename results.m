@@ -17,6 +17,7 @@ w_f=4*Vdot/(pi*d_in^2);     % working fluid velocity
 dz=L/(nodes-1);                 % spatial step (m)
 dtau=dz/w_f;                % maximum time step (s)
 time_steps= round(total_simulation_time/dtau);   % number of time steps
+selected_node = nodes/2;
 if dtau>dz/w_f
     fprintf('error in flow rate')
 else
@@ -26,7 +27,7 @@ else
     count = fprintf(fid,'number of nodes = %6.1f\nflowrate(GPM) = %6.1f\ntotal_simulation_time(s) = %6.1f\ninitial temperature(C) = %6.1f\ntime step(s) = %6.1f\n', nodes,flowrate,total_simulation_time,t_in_0,dtau);
     count = fprintf(fid,'time    irrad   t_in    T_out   Q_out    T_g       T_a     T_ab    T_f     T_i     n_iter \n');
     %%%%%%%%%%%%%%%%%%%%
-    t_am=zeros(time_steps+1,1)+(28+273.15);  % Ambient temp.
+    t_am=ones(time_steps+1,1)*(28+273.15);  % Ambient temp.
     G_r=zeros(time_steps+1,1);   % Heat flux of solar radiation. (W/sqm)
     t_g=ones(nodes,1)*293;      % initial glass temp.
     t_a=ones(nodes,1)*293;      % initial air gap temp.
@@ -39,45 +40,45 @@ else
     eff=zeros(time_steps,1);
     t_in=ones(time_steps,1)* (t_in_0+273);
     counter=1;
-    for k=1:time_steps+1
-%         t_am(k)=28+273.15;
+    for t=1:time_steps+1
+%         t_am(t)=28+273.15;
         % Step change in irradiance at 1 hour
-        if k*dtau<=3600
-            G_r(k)=660;
+        if t*dtau<=3600
+            G_r(t)=660;
         else
-            G_r(k)=0;
+            G_r(t)=0;
         end
     end
-    for k = 1:time_steps
+    for t = 1:time_steps
         n_converge=0;
-        [B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X,J]=coeff(t_g,t_a,t_ab,t_f,t_i,t_am,dtau,dz,nodes,mdot,k,w_f);
+        [B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X,J]=coeff(t_g,t_a,t_ab,t_f,t_i,t_am,dtau,dz,nodes,mdot,t,w_f);
         n_iter = 0;
         while n_converge < 5*nodes
             n_iter = n_iter + 1;
             t_g_old=t_g;t_a_old=t_a;t_ab_old=t_ab;t_f_old=t_f;t_i_old=t_i;
-            t_g(1)=((t_g_old(1)/dtau)+(B(1)*t_am(k))+(C(1)*t_ab(1))+(D(1)*t_a(1))+(E(1)*G_r(k)))/F(1);
+            t_g(1)=((t_g_old(1)/dtau)+(B(1)*t_am(t))+(C(1)*t_ab(1))+(D(1)*t_a(1))+(E(1)*G_r(t)))/F(1);
             t_a(1)=((t_a_old(1)/dtau)+(G(1)*(t_g(1)+t_ab(1))))/H(1);
-            t_ab(1)=((t_ab_old(1)/dtau)+(K(1)*G_r(k))+(L(1)*t_g(1))+(M(1)*t_a(1))+(O(1)*t_f(1))+(P(1)*t_i(1)))/Q(1);
-            t_f(1)=t_in(k);
-            t_i(1)=((t_i_old(1)/dtau)+(V(1)*t_ab(1))+(W(1)*t_am(k)))/X(1);
-            for j=2:nodes
-                t_g(j)=((t_g_old(j)/dtau)+(B(j)*t_am(k))+(C(j)*t_ab(j))+(D(j)*t_a(j))+(E(j)*G_r(k)))/F(j);
-                t_a(j)=((t_a_old(j)/dtau)+(G(j)*(t_g(j)+t_ab(j))))/H(j);
-                t_ab(j)=((t_ab_old(j)/dtau)+(K(j)*G_r(k))+(L(j)*t_g(j))+(M(j)*t_a(j))+(O(j)*t_f(j))+(P(j)*t_i(j)))/Q(j);
-                t_f(j)=((t_f_old(j)/dtau)+(R(j)*t_ab(j))+(S(j)*t_f(j-1)/dz))/U(j);
-                t_i(j)=((t_i_old(j)/dtau)+(V(j)*t_ab(j))+(W(j)*t_am(k)))/X(j);
+            t_ab(1)=((t_ab_old(1)/dtau)+(K(1)*G_r(t))+(L(1)*t_g(1))+(M(1)*t_a(1))+(O(1)*t_f(1))+(P(1)*t_i(1)))/Q(1);
+            t_f(1)=t_in(t);
+            t_i(1)=((t_i_old(1)/dtau)+(V(1)*t_ab(1))+(W(1)*t_am(t)))/X(1);
+            for z=2:nodes
+                t_g(z)=((t_g_old(z)/dtau)+(B(z)*t_am(t))+(C(z)*t_ab(z))+(D(z)*t_a(z))+(E(z)*G_r(t)))/F(z);
+                t_a(z)=((t_a_old(z)/dtau)+(G(z)*(t_g(z)+t_ab(z))))/H(z);
+                t_ab(z)=((t_ab_old(z)/dtau)+(K(z)*G_r(t))+(L(z)*t_g(z))+(M(z)*t_a(z))+(O(z)*t_f(z))+(P(z)*t_i(z)))/Q(z);
+                t_f(z)=((t_f_old(z)/dtau)+(R(z)*t_ab(z))+(S(z)*t_f(z-1)/dz))/U(z);
+                t_i(z)=((t_i_old(z)/dtau)+(V(z)*t_ab(z))+(W(z)*t_am(t)))/X(z);
             end
 
             % check convergence
             ccc = 0;
-            for j=1:nodes
+            for z=1:nodes
                 if ccc<=0
                     error=zeros(5,1);
-                    error(1)=abs(t_g(j)-t_g_old(j))/t_g(j);
-                    error(2)=abs(t_a(j)-t_a_old(j))/t_a(j);
-                    error(3)=abs(t_ab(j)-t_ab_old(j))/t_ab(j);
-                    error(4)=abs(t_f(j)-t_f_old(j))/t_f(j);
-                    error(5)=abs(t_i(j)-t_i_old(j))/t_i(j);
+                    error(1)=abs(t_g(z)-t_g_old(z))/t_g(z);
+                    error(2)=abs(t_a(z)-t_a_old(z))/t_a(z);
+                    error(3)=abs(t_ab(z)-t_ab_old(z))/t_ab(z);
+                    error(4)=abs(t_f(z)-t_f_old(z))/t_f(z);
+                    error(5)=abs(t_i(z)-t_i_old(z))/t_i(z);
                     for i=1:5
                         if (error(i)<=10^-4)
                             n_converge=n_converge+1;
@@ -88,15 +89,15 @@ else
                 end
             end
         end
-        t_gc(k)= t_g(nodes/2);t_ac(k)= t_a(nodes/2);t_abc(k)= t_ab(nodes/2);
-        t_fc(k)= t_f(nodes/2);t_ic(k)= t_i(nodes/2);t_out(k)= t_f(nodes);
-        %t_in(k+1)= (mdot*8/m_tank)*1.0152*dtau*(t_out(k)-t_in(k))-(12*3*dtau*(t_in(k)-t_am(k)))/(m_tank*4070)+t_in(k);
-        Q_dot(k)= mdot*n_tubes*4186*(t_out(k)-t_in(k));
-        eff(k)=Q_dot(k)/(G_r(k)*collector_area);
-        time = dtau*k/60;
-        fprintf('time = %6.1f t_in = %8.2f T_out = %8.2f Q_out = %8.2f T_g =%8.2f T_a = %8.2f T_ab = %8.2f T_f = %8.2f T_i = %8.2f n_iter =%5.0f\n',time,t_in(k),t_out(k),Q_dot(k),t_gc(k),t_ac(k),t_abc(k),t_fc(k),t_ic(k),n_iter);
+        t_gc(t)= t_g(selected_node);t_ac(t)= t_a(selected_node);t_abc(t)= t_ab(selected_node);
+        t_fc(t)= t_f(selected_node);t_ic(t)= t_i(selected_node);t_out(t)= t_f(nodes);
+        %t_in(t+1)= (mdot*8/m_tank)*1.0152*dtau*(t_out(t)-t_in(t))-(12*3*dtau*(t_in(t)-t_am(t)))/(m_tank*4070)+t_in(t);
+        Q_dot(t)= mdot*n_tubes*4186*(t_out(t)-t_in(t));
+        eff(t)=Q_dot(t)/(G_r(t)*collector_area);
+        time = dtau*t/60;
+        fprintf('time = %6.1f t_in = %8.2f T_out = %8.2f Q_out = %8.2f T_g =%8.2f T_a = %8.2f T_ab = %8.2f T_f = %8.2f T_i = %8.2f n_iter =%5.0f\n',time,t_in(t),t_out(t),Q_dot(t),t_gc(t),t_ac(t),t_abc(t),t_fc(t),t_ic(t),n_iter);
         if time-counter >=0
-            count = fprintf(fid,'%6.1f %6.1f %8.2f %8.2f %8.2f %8.2f %8.2f%8.2f %8.2f %8.2f %5.0f\n',time,G_r(k),t_in(k),t_out(k),Q_dot(k),t_gc(k),t_ac(k),t_abc(k),t_fc(k),t_ic(k),n_iter);
+            count = fprintf(fid,'%6.1f %6.1f %8.2f %8.2f %8.2f %8.2f %8.2f%8.2f %8.2f %8.2f %5.0f\n',time,G_r(t),t_in(t),t_out(t),Q_dot(t),t_gc(t),t_ac(t),t_abc(t),t_fc(t),t_ic(t),n_iter);
             counter=counter+1;
         end
     end
@@ -122,6 +123,7 @@ else
     plot(T,eff)
     ylabel("efficiency")
     xlabel('time (s)')
+    sgtitle(['Selected node: ' num2str(selected_node) ' of ' num2str(nodes)]) 
     runtime = cputime-ts
     count = fprintf(fid,'run time = %6.1f\n',runtime);
     status = fclose(fid);
