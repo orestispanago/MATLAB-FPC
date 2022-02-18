@@ -1,31 +1,32 @@
-function[B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X,J]= coeff(t_g,t_a,t_ab,t_f,t_i,t_am,dtau,dz,nodes,mdot,k,w_f)
-% Coefficients of the transiant temperature equations.
-[p,d_in,r_o,r_in,A,delta_g,delta_i,delta_ab,delta_a,c_g,c_i,rho_g,rho_i,alpha,tau_alpha, K_i,c_ab,rho_ab,c_a]= get_constants;
-[h_g_am, h_r1, h_c1, h_f, h_i_am]= get_h(t_f,t_a,t_g,t_ab,t_i,nodes,t_am,delta_a,d_in,k,w_f);
-[rho_a] = rho(t_a);
-[rho_f,c_f]= waterprop(t_f);
-B=zeros(nodes,1);C=zeros(nodes,1);D=zeros(nodes,1);E=zeros(nodes,1);F=zeros(nodes,1);J=zeros(nodes,1);K=zeros(nodes,1);L=zeros(nodes,1);M=zeros(nodes,1);O=zeros(nodes,1);
-P=zeros(nodes,1);G=zeros(nodes,1);H=zeros(nodes,1);Q=zeros(nodes,1);R=zeros(nodes,1);S=zeros(nodes,1);U=zeros(nodes,1);V=zeros(nodes,1);W=zeros(nodes,1);X=zeros(nodes,1);
-for j=1:nodes
-    B(j)=h_g_am(j)/(c_g*rho_g*delta_g);
-    C(j)=h_r1(j)/(c_g*rho_g*delta_g);
-    D(j)=h_c1(j)/(c_g*rho_g*delta_g);
-    E(j)=alpha/(c_g*rho_g*delta_g);
-    F(j)=(1/dtau)+B(j)+C(j)+D(j);
-    J(j)=c_ab*rho_ab*(p*delta_ab+pi*(r_o^2-r_in^2));
-    K(j)=p*(tau_alpha)/J(j);
-    L(j)=h_r1(j)*p/J(j);
-    M(j)=h_c1(j)*p/J(j);
-    O(j)=pi*d_in*h_f(j)/J(j);
-    P(j)=p*K_i/(J(j)*delta_i);
-    G(j)=h_c1(j)*p/(c_a*rho_a(j)*(p*delta_a-pi*r_o^2));
-    H(j)=(1/dtau)+(2*G(j));
-    Q(j)=(1/dtau)+L(j)+M(j)+O(j)+P(j);
-    R(j)=pi*d_in*h_f(j)/(c_f(j)*rho_f(j)*A);
-    S(j)=mdot/(rho_f(j)*A);
-    U(j)=(1/dtau)+R(j)+(S(j)/dz);
-    V(j)=2*K_i/(c_i*rho_i*delta_i^2);
-    W(j)=2*h_i_am(j)/(c_i*rho_i*delta_i);
-    X(j)=(1/dtau)+V(j)+W(j);
+function[B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X,J]= coeff(t_glass,t_air,t_abs,t_fluid,t_insul,t_amb,dtau,dz,n_nodes,mdot,t,fluid_velocity)
+% Coefficients of the transient temperature equations.
+[p,d_in,r_o,r_in,A,delta_glass,delta_insul,delta_abs,delta_air,cp_glass,cp_ins,rho_glass,rho_insul,alpha,tau_alpha, k_insul,cp_abs,rho_abs,cp_air]= get_constants;
+[h_g_am, h_r1, h_c1, h_f, h_i_am]= get_h(t_fluid,t_air,t_glass,t_abs,t_insul,n_nodes,t_amb,delta_air,d_in,t,fluid_velocity);
+rho_air = rho_a(t_air);
+rho_fluid = rho_f(t_fluid);
+c_f = cp_fluid(t_fluid);
+B=zeros(n_nodes,1);C=zeros(n_nodes,1);D=zeros(n_nodes,1);E=zeros(n_nodes,1);F=zeros(n_nodes,1);J=zeros(n_nodes,1);K=zeros(n_nodes,1);L=zeros(n_nodes,1);M=zeros(n_nodes,1);O=zeros(n_nodes,1);
+P=zeros(n_nodes,1);G=zeros(n_nodes,1);H=zeros(n_nodes,1);Q=zeros(n_nodes,1);R=zeros(n_nodes,1);S=zeros(n_nodes,1);U=zeros(n_nodes,1);V=zeros(n_nodes,1);W=zeros(n_nodes,1);X=zeros(n_nodes,1);
+for z=1:n_nodes
+    B(z)=h_g_am(z)/(cp_glass*rho_glass*delta_glass);
+    C(z)=h_r1(z)/(cp_glass*rho_glass*delta_glass);
+    D(z)=h_c1(z)/(cp_glass*rho_glass*delta_glass);
+    E(z)=alpha/(cp_glass*rho_glass*delta_glass);
+    F(z)=(1/dtau)+B(z)+C(z)+D(z);
+    J(z)=cp_abs*rho_abs*(p*delta_abs+pi*(r_o^2-r_in^2));
+    K(z)=p*(tau_alpha)/J(z);
+    L(z)=h_r1(z)*p/J(z);
+    M(z)=h_c1(z)*p/J(z);
+    O(z)=pi*d_in*h_f(z)/J(z);
+    P(z)=p*k_insul/(J(z)*delta_insul);
+    G(z)=h_c1(z)*p/(cp_air*rho_air(z)*(p*delta_air-pi*r_o^2));
+    H(z)=(1/dtau)+(2*G(z));
+    Q(z)=(1/dtau)+L(z)+M(z)+O(z)+P(z);
+    R(z)=pi*d_in*h_f(z)/(c_f(z)*rho_fluid(z)*A);
+    S(z)=mdot/(rho_fluid(z)*A);
+    U(z)=(1/dtau)+R(z)+(S(z)/dz);
+    V(z)=2*k_insul/(cp_ins*rho_insul*delta_insul^2);
+    W(z)=2*h_i_am(z)/(cp_ins*rho_insul*delta_insul);
+    X(z)=(1/dtau)+V(z)+W(z);
 end
 end
