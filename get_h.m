@@ -10,7 +10,7 @@ a=1.9;b=.92;L=a;    % collector dimensions
 U_inf=1.5;          % wind velocity
 h_fluid=zeros(n_nodes,1);h_r1=zeros(n_nodes,1);h_c1=zeros(n_nodes,1);h_glass_amb=zeros(n_nodes,1);
 h_insul_amb=zeros(n_nodes,1);Nu_fluid=zeros(n_nodes,1);Nu_air=zeros(n_nodes,1);Ra=zeros(n_nodes,1);
-ny_amb =1.5743*10^-5;
+ny_amb =1.5743*10^-5;% ambient kinematic viscosity (m2/s)
 k_amb=.0262;         % ambient thermal conductivity
 Pr_amb=0.71432;      % ambient Prandtl number
 delta=4*a*b/sqrt(a^2+b^2);
