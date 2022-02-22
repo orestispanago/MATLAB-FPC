@@ -1,4 +1,4 @@
-function[B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X,J]= coeff(t_glass,t_air,t_abs,t_fluid,t_insul,t_amb,dtau,dz,n_nodes,mdot,t,fluid_velocity)
+function[B,C,D,E,F,G,H,K,L,M,O,P,Q,R,S,U,V,W,X]= coeff(t_glass,t_air,t_abs,t_fluid,t_insul,t_amb,dtau,dz,n_nodes,mdot,t,fluid_velocity)
 % Coefficients of the transient temperature equations.
 [p,d_in,r_o,r_in,A,delta_glass,delta_insul,delta_abs,delta_air,cp_glass,cp_ins,rho_glass,rho_insul,alpha,tau_alpha, k_insul,cp_abs,rho_abs,cp_air]= get_constants;
 [h_g_am, h_r1, h_c1, h_f, h_i_am]= get_h(t_fluid,t_air,t_glass,t_abs,t_insul,n_nodes,t_amb,delta_air,d_in,t,fluid_velocity);

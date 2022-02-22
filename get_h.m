@@ -1,15 +1,15 @@
-function [h_glass_amb, h_r1, h_c1, h_fluid, h_insul_amb]= get_h(t_fluid,t_air,t_glass,t_abs,t_insul,n_nodes,t_amb,delta_a,d_in,t,fluid_velocity)
+function [h_glass_amb, h_r1, h_c1, h_water, h_insul_amb]= get_h(t_water,t_air,t_glass,t_abs,t_insul,n_nodes,t_amb,delta_a,d_in,t,fluid_velocity)
 [ny_air,alpha_air,k_air] = air_prop(t_air);
-[k_fluid,ny_fluid,Pr_fluid]=kf(t_fluid);
-Re_f=fluid_velocity.*d_in./ny_fluid;
+[k_water,ny_water,Pr_water]=kf(t_water);
+Re_water=fluid_velocity.*d_in./ny_water;
 sigma=5.6697*10^-8; % Stefan-Bolzmann constant (W/m2.K4)
 emi_glass=.88;emi_abs=.1;emi_insul=.05;
 g=9.81;
 theta=(pi/4);       % tilt angle
 a=1.9;b=.92;L=a;    % collector dimensions
 U_inf=1.5;          % wind velocity
-h_fluid=zeros(n_nodes,1);h_r1=zeros(n_nodes,1);h_c1=zeros(n_nodes,1);h_glass_amb=zeros(n_nodes,1);
-h_insul_amb=zeros(n_nodes,1);Nu_fluid=zeros(n_nodes,1);Nu_air=zeros(n_nodes,1);Ra=zeros(n_nodes,1);
+h_water=zeros(n_nodes,1);h_r1=zeros(n_nodes,1);h_c1=zeros(n_nodes,1);h_glass_amb=zeros(n_nodes,1);
+h_insul_amb=zeros(n_nodes,1);Nu_water=zeros(n_nodes,1);Nu_air=zeros(n_nodes,1);Ra=zeros(n_nodes,1);
 ny_amb =1.5743*10^-5;% ambient kinematic viscosity (m2/s)
 k_amb=.0262;         % ambient thermal conductivity
 Pr_amb=0.71432;      % ambient Prandtl number
@@ -17,10 +17,9 @@ delta=4*a*b/sqrt(a^2+b^2);
 Re_amb=U_inf*delta/ny_amb;
 Nu_amb=.86*Re_amb^.5*Pr_amb^(1/3);
 h_c2=Nu_amb*k_amb/delta;
-%
 t_sky=.0552.*t_amb.^1.5;
-Nu_fluid=4.4+(.00398.*(Re_f.*Pr_fluid.*(d_in/L)).^1.66./(1+.0114.*(Re_f.*Pr_fluid.*(d_in/L)).^1.12));
-h_fluid=Nu_fluid.*k_fluid./d_in;
+Nu_water = nu_water(Re_water, Pr_water, d_in, L);
+h_water=Nu_water.*k_water./d_in;
 for z=1:n_nodes
     Ra(z)=abs(t_glass(z)-t_abs(z))*g*delta_a^3/(ny_air(z)*alpha_air(z)*t_air(z));
     AA=1-(1708/(Ra(z)*cos(theta)));
